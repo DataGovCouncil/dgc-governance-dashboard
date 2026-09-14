@@ -6,393 +6,549 @@
 <title>Governance Leaderboard | The Scion Group</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Azeret+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 
+
 :root{
-  --paper:#ffffff;
-  --tint:#FBFAF5;
-  --tint2:#F4F2EA;
-  --line:#E8E4D7;
-  --line-2:#D5D0BF;
-  --ink:#15130C;
-  --ink-2:#464233;
-  --ink-3:#6E6857;
-  --gold:#FFD135;
-  --gold-deep:#7A5C00;
-  --blue:#3B82C4;
-  --teal:#16A070;
-  --coral:#D06030;
-  --violet:#8B5CC4;
-  --green:#16904E;
-  --red:#C43030;
-  --shadow:0 1px 2px rgba(21,19,12,.04), 0 10px 28px -16px rgba(21,19,12,.22);
+  --bg:oklch(98.5% 0.005 85);
+  --surface:oklch(100% 0.003 85);
+  --surface-alt:oklch(96% 0.006 85);
+  --text-primary:oklch(15% 0.01 85);
+  --text-secondary:oklch(45% 0.01 85);
+  --text-soft:oklch(52% 0.012 85);
+  --text-muted:oklch(62% 0.008 85);
+  --text-dim:oklch(55% 0.01 85);
+  --border:oklch(90% 0.008 85);
+  --border-subtle:oklch(94% 0.005 85);
+  --accent:oklch(85% 0.17 85);
+  --accent-deep:oklch(74% 0.16 78);
+  --accent-dim:oklch(92% 0.08 85);
+  --governance:oklch(58% 0.2 265);
+  --governance-light:oklch(70% 0.16 265);
+  --engineering:oklch(62% 0.2 30);
+  --engineering-text:oklch(48% 0.18 30);
+  --track:oklch(93% 0.005 85);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-body{background:var(--paper);color:var(--ink);font-family:'Archivo',system-ui,sans-serif;font-size:16px;line-height:1.5}
-.wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+body{
+  background:var(--bg);color:var(--text-primary);
+  font-family:'Manrope',system-ui,sans-serif;font-size:16px;line-height:1.5;
+  padding:40px 20px;
+}
+@media (min-width:640px){body{padding:56px 40px}}
+.shell{max-width:1180px;margin:0 auto;display:flex;gap:24px}
+.col{min-width:0;flex:1}
+.tnum{font-variant-numeric:tabular-nums}
 
-/* ---- gold stripe ---- */
-.stripe{position:relative;height:8px;background:var(--gold);overflow:hidden}
-.stripe .sweep{position:absolute;top:0;left:-30%;width:30%;height:100%;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.85),rgba(255,255,255,0));animation:sweep 9s cubic-bezier(.5,0,.35,1) infinite}
-@keyframes sweep{0%{left:-30%}55%{left:110%}100%{left:110%}}
+/* ---- altitude rail ---- */
+.rail{position:relative;width:104px;flex:none;display:none}
+@media (min-width:1024px){.rail{display:block}}
+.rail-inner{position:sticky;top:48px;padding-left:4px}
+.rail-line{position:absolute;left:10px;top:8px;bottom:8px;width:1px;background:var(--border)}
+.rail-dot{
+  position:absolute;left:6px;width:9px;height:9px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);
+  transition:top .5s cubic-bezier(.22,1,.36,1);
+}
+.rail ul{list-style:none}
+.rail li{padding-left:24px}
+.rail li+li{margin-top:56px}
+.rail .fl{font-size:13px;font-weight:800;letter-spacing:.08em;color:var(--text-dim);transition:color .3s}
+.rail .nm{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);transition:color .3s}
+.rail li.on .fl{color:var(--text-primary)}
+.rail li.on .nm{color:var(--text-soft)}
 
 /* ---- header ---- */
-.header{display:flex;align-items:flex-start;justify-content:space-between;padding:30px 0 26px;border-bottom:1px solid var(--line);flex-wrap:wrap;gap:16px}
-.header h1{font-size:clamp(26px,3.6vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.1;white-space:nowrap}
-.header h1 span{color:var(--gold);-webkit-text-stroke:1.5px var(--ink)}
-.header p{font-size:14.5px;color:var(--ink-2);margin-top:4px}
-.stamp{
-  display:inline-flex;align-items:center;gap:8px;
-  border:1px solid var(--line-2);border-radius:999px;padding:6px 14px 6px 11px;
-  background:var(--tint);font-family:'Azeret Mono',monospace;font-size:12px;font-weight:500;color:var(--ink-2);white-space:nowrap;
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px 32px;margin-bottom:32px}
+.eyebrow{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.18em;color:var(--text-soft)}
+h1{font-size:38px;font-weight:800;line-height:1.05;letter-spacing:-.035em;margin-top:8px}
+@media (min-width:640px){h1{font-size:46px}}
+.sub{font-size:15px;font-weight:500;color:var(--text-secondary);margin-top:4px}
+.tabs{display:flex;align-items:center;gap:4px;padding:4px;border-radius:999px;background:var(--surface);border:1px solid var(--border)}
+.tabs button{
+  font:inherit;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;
+  padding:8px 20px;border:0;border-radius:999px;background:transparent;color:var(--text-secondary);
+  cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;
 }
-.stamp .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);flex:none;box-shadow:0 0 0 0 rgba(255,209,53,.9);animation:pulse 2.8s ease-out infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,209,53,.9)}70%{box-shadow:0 0 0 8px rgba(255,209,53,0)}100%{box-shadow:0 0 0 0 rgba(255,209,53,0)}}
+.tabs button:hover:not(.on){background:var(--surface-alt)}
+.tabs button.on{background:var(--text-primary);color:var(--bg)}
 
-/* ---- toggles ---- */
-.toggle-bar{display:flex;align-items:center;gap:22px;flex-wrap:wrap;padding:22px 0 0}
-.toggle-group{display:flex;align-items:center;gap:10px}
-.toggle-label{font-family:'Azeret Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
-.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:2px;overflow:hidden;background:var(--paper)}
-.seg button{font:inherit;font-size:13.5px;font-weight:600;padding:7px 16px;border:0;background:transparent;color:var(--ink-2);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
-.seg button+button{border-left:1px solid var(--line-2)}
-.seg button:hover:not(:disabled):not(.on){background:var(--tint2)}
-.seg button.on{background:var(--ink);color:#fff}
-.seg.gold button.on{background:var(--gold);color:var(--ink)}
-.seg button:disabled{color:#BAB4A2;cursor:not-allowed}
-.divider-dot{width:4px;height:4px;border-radius:50%;background:var(--line-2)}
+/* ---- bars ---- */
+.bar{width:100%;border-radius:999px;background:var(--track);overflow:hidden}
+.bar>span{display:block;height:100%;border-radius:999px;width:0;transition:width 1.1s cubic-bezier(.22,1,.36,1)}
+.bar.governance>span{background:linear-gradient(90deg,var(--governance) 0%,var(--governance-light) 100%)}
+.bar.overall>span{background:linear-gradient(90deg,var(--accent-deep) 0%,var(--accent) 100%)}
+.bar.lag>span{background:linear-gradient(90deg,var(--engineering) 0%,oklch(74% 0.15 40) 100%)}
+.ghost{width:100%;border-radius:999px;background-image:repeating-linear-gradient(115deg,var(--border) 0 4px,transparent 4px 9px)}
 
-/* ---- notice ---- */
-.notice{display:flex;margin-top:20px;padding:12px 16px;border-radius:3px;background:var(--tint);border:1px solid var(--line);border-left:3px solid var(--gold);font-size:14px;color:var(--ink-2)}
-.notice strong{color:var(--ink);font-weight:600}
-
-/* ---- hero cards ---- */
-.hero-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:26px 0 6px}
-.hero-card{
-  background:var(--paper);border:1px solid var(--line);border-radius:14px;
-  padding:20px 22px 22px;position:relative;overflow:hidden;
-  transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+/* ---- FL500 readout ---- */
+.readout{position:relative;overflow:hidden;border-radius:16px;background:var(--surface);border:1px solid var(--border);padding:28px 20px}
+@media (min-width:640px){.readout{padding:32px 36px}}
+.readout .sweep{
+  position:absolute;top:0;bottom:0;width:33%;pointer-events:none;opacity:.55;
+  background:linear-gradient(90deg,transparent,var(--accent-dim),transparent);
+  animation:sweep 9s linear infinite;
 }
-.hero-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--line-2)}
-.hero-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
-.hero-card[data-color="blue"]::before{background:var(--blue)}
-.hero-card[data-color="teal"]::before{background:var(--teal)}
-.hero-card[data-color="coral"]::before{background:var(--coral)}
-.hero-card[data-color="violet"]::before{background:var(--violet)}
-.phase-badge{
-  display:inline-flex;align-items:center;gap:5px;
-  font-family:'Azeret Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-  padding:3px 10px;border-radius:4px;margin-bottom:10px;
-}
-.phase-badge.lite{background:rgba(255,209,53,.18);color:var(--gold-deep)}
-.phase-badge.heavy{background:rgba(208,96,48,.12);color:var(--coral)}
-.hero-card .project-label{
-  font-size:13px;font-weight:700;letter-spacing:-.01em;color:var(--ink);margin-bottom:6px;
-}
-.big-number{font-size:clamp(32px,4vw,44px);font-weight:800;font-variant-numeric:tabular-nums;line-height:1;margin-bottom:10px}
-.hero-card[data-color="blue"] .big-number{color:var(--blue)}
-.hero-card[data-color="teal"] .big-number{color:var(--teal)}
-.hero-card[data-color="coral"] .big-number{color:var(--coral)}
-.hero-card[data-color="violet"] .big-number{color:var(--violet)}
-.dept-count{font-size:13px;color:var(--ink-3);font-weight:500}
-.hero-ring{position:absolute;top:16px;right:16px;width:48px;height:48px}
-.hero-ring circle{fill:none;stroke-width:5;stroke-linecap:round}
-.hero-ring .track{stroke:var(--line)}
-.hero-card[data-color="blue"] .hero-ring .fill{stroke:var(--blue)}
-.hero-card[data-color="teal"] .hero-ring .fill{stroke:var(--teal)}
-.hero-card[data-color="coral"] .hero-ring .fill{stroke:var(--coral)}
-.hero-card[data-color="violet"] .hero-ring .fill{stroke:var(--violet)}
+@keyframes sweep{0%{transform:translateX(-140%)}100%{transform:translateX(340%)}}
+.readout-grid{position:relative;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px 40px}
+.label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.16em;color:var(--text-soft)}
+.huge{display:flex;align-items:flex-end;gap:16px;margin-top:8px}
+.huge .n{font-size:86px;font-weight:800;line-height:.82;letter-spacing:-.045em;color:var(--text-primary)}
+@media (min-width:640px){.huge .n{font-size:104px}}
+.huge .p{max-width:15rem;padding-bottom:8px;font-size:15px;font-weight:500;line-height:1.35;color:var(--text-secondary)}
+.topics{width:100%;max-width:24rem;flex:none}
+.topics .rows{display:grid;gap:12px;margin-top:20px}
+.trow{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:0 16px}
+.trow .nm{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-secondary)}
+.trow .track{width:112px}
+@media (min-width:640px){.trow .track{width:160px}}
+.trow .pc{width:40px;text-align:right;font-size:14px;font-weight:800;color:var(--text-primary)}
 
-/* ---- controls bar ---- */
-.controls-bar{display:flex;align-items:center;justify-content:space-between;margin-top:30px;margin-bottom:16px;flex-wrap:wrap;gap:12px}
-.section-title{font-size:19px;font-weight:700;letter-spacing:-.02em}
-.pill-group{display:inline-flex;border:1px solid var(--line-2);border-radius:2px;overflow:hidden;background:var(--paper)}
-.pill{font:inherit;font-size:13px;font-weight:600;padding:7px 14px;border:0;background:transparent;color:var(--ink-2);cursor:pointer;transition:background .15s,color .15s}
-.pill+.pill{border-left:1px solid var(--line-2)}
-.pill:hover:not(.active){background:var(--tint2)}
-.pill.active{background:var(--gold);color:var(--ink)}
+/* ---- section headers ---- */
+.section{margin-top:40px}
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 24px;margin-bottom:12px}
+.sec-head h2{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-secondary)}
+.sec-head p{font-size:13px;font-weight:500;color:var(--text-soft)}
 
-/* ---- project cards ---- */
-.project-grid{display:flex;flex-direction:column;gap:14px}
-.project-card{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:border-color .2s}
-.project-card:hover{border-color:var(--line-2)}
-.project-card-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;cursor:pointer;user-select:none;transition:background .12s}
-.project-card-header:hover{background:var(--tint)}
-.pch-left{display:flex;align-items:center;gap:14px}
-.color-badge{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff}
-.project-card[data-project="property"] .color-badge{background:var(--blue)}
-.project-card[data-project="cfi-consolidation"] .color-badge{background:var(--teal)}
-.project-card[data-project="parking-consolidation"] .color-badge{background:var(--coral)}
-.project-card[data-project="non-revenue-inventory"] .color-badge{background:var(--violet)}
-.pch-info .pch-name{font-size:15px;font-weight:700;color:var(--ink)}
-.pch-info .pch-sub{font-size:12.5px;color:var(--ink-3);margin-top:1px}
-.pch-right{display:flex;align-items:center;gap:18px}
-.pch-stats{display:flex;gap:14px;align-items:center}
-.pch-stat{text-align:center}
-.pch-stat .stat-val{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
-.pch-stat .stat-val.g{color:var(--green)}
-.pch-stat .stat-val.r{color:var(--red)}
-.pch-stat .stat-label{font-family:'Azeret Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
-.chevron-btn{width:28px;height:28px;border-radius:8px;background:var(--tint2);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
-.chevron-btn:hover{background:var(--line)}
-.chevron-btn svg{width:16px;height:16px;color:var(--ink-3);transition:transform .25s cubic-bezier(.22,1,.36,1)}
-.project-card.open .chevron-btn svg{transform:rotate(180deg)}
-.project-card-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s cubic-bezier(.22,1,.36,1)}
-.project-card.open .project-card-body{grid-template-rows:1fr}
-.project-card-body-inner{overflow:hidden}
-
-/* ---- dept tiles ---- */
-.dept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;padding:4px 24px 22px}
-.dept-tile{
-  background:var(--tint);border:1px solid var(--line);border-radius:8px;
-  padding:12px 14px;display:flex;flex-direction:column;gap:7px;
-  transition:border-color .15s,background .15s;
+/* ---- FL200 domain rows ---- */
+.domains{overflow:hidden;border-radius:14px;background:var(--surface);border:1px solid var(--border)}
+.drow+.drow{border-top:1px solid var(--border-subtle)}
+.dhead{
+  display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px 20px;
+  width:100%;padding:20px;text-align:left;border:0;background:transparent;
+  font:inherit;color:inherit;cursor:pointer;transition:background .15s;
 }
-.dept-tile:hover{border-color:var(--line-2);background:var(--tint2)}
-.dept-tile-top{display:flex;align-items:center;justify-content:space-between}
-.dept-tile-name{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dept-tile-pct{font-family:'Azeret Mono',monospace;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
-.dept-tile-bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
-.dept-tile-bar-fill{height:100%;border-radius:3px;transition:width .5s cubic-bezier(.22,1,.36,1)}
-.project-card[data-project="property"] .dept-tile-bar-fill{background:var(--blue)}
-.project-card[data-project="property"] .dept-tile-pct{color:var(--blue)}
-.project-card[data-project="cfi-consolidation"] .dept-tile-bar-fill{background:var(--teal)}
-.project-card[data-project="cfi-consolidation"] .dept-tile-pct{color:var(--teal)}
-.project-card[data-project="parking-consolidation"] .dept-tile-bar-fill{background:var(--coral)}
-.project-card[data-project="parking-consolidation"] .dept-tile-pct{color:var(--coral)}
-.project-card[data-project="non-revenue-inventory"] .dept-tile-bar-fill{background:var(--violet)}
-.project-card[data-project="non-revenue-inventory"] .dept-tile-pct{color:var(--violet)}
-.dept-tile.complete{border-color:rgba(22,144,78,.35)}
-.dept-tile.complete .dept-tile-pct{color:var(--green) !important}
-.dept-tile.complete .dept-tile-bar-fill{background:var(--green) !important}
-.dept-tile.zero .dept-tile-pct{color:var(--red) !important}
+@media (min-width:640px){.dhead{grid-template-columns:16.5rem 1fr 5.5rem auto;padding:20px 32px}}
+.dhead:hover{background:var(--surface-alt)}
+.dhead:focus-visible{outline:none;background:var(--accent-dim)}
+.dname{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;min-width:0}
+@media (min-width:640px){.dname{flex-wrap:nowrap}}
+.dname .t{font-size:21px;font-weight:800;letter-spacing:-.02em;color:var(--text-primary)}
+.dname .flag{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--engineering-text);white-space:nowrap}
+.dmid{order:3;grid-column:span 2}
+@media (min-width:640px){.dmid{order:0;grid-column:auto}}
+.dmid .cap{display:block;margin-top:8px;font-size:12px;font-weight:600;color:var(--text-soft)}
+.dpct{text-align:right;font-size:30px;font-weight:800;line-height:1;letter-spacing:-.02em;color:var(--text-primary)}
+.dright{display:flex;align-items:center;justify-content:flex-end;gap:16px}
+.dfrac{display:none;width:64px;text-align:right;font-size:13px;font-weight:600;color:var(--text-soft)}
+@media (min-width:640px){.dfrac{display:block}}
+.chev{
+  display:grid;place-items:center;width:28px;height:28px;flex:none;border-radius:50%;
+  border:1px solid var(--border);color:var(--text-secondary);
+  transition:transform .3s cubic-bezier(.22,1,.36,1);
+}
+.drow.open .chev{transform:rotate(180deg)}
+.chev svg{width:14px;height:14px}
+
+/* ---- FL050 descent ---- */
+.descent{display:grid;grid-template-rows:0fr;transition:grid-template-rows .42s cubic-bezier(.22,1,.36,1)}
+.drow.open .descent{grid-template-rows:1fr}
+.descent-clip{overflow:hidden}
+.descent-in{padding:20px;background:var(--surface-alt);border-top:1px solid var(--border-subtle)}
+@media (min-width:640px){.descent-in{padding:20px 32px}}
+.descent-in .label{margin-bottom:16px;letter-spacing:.14em}
+.pgrid{display:grid;gap:16px 40px}
+@media (min-width:640px){.pgrid{grid-template-columns:1fr 1fr}}
+.pcell{display:grid;grid-template-columns:1fr auto;align-items:center;gap:0 16px}
+.pcell .nm{font-size:14px;font-weight:700;color:var(--text-secondary)}
+.pcell .pc{font-size:15px;font-weight:800;color:var(--text-primary)}
+.pcell .pc.out{color:var(--text-soft)}
+.pcell .line{grid-column:span 2;display:flex;align-items:center;gap:12px;margin-top:8px}
+.pcell .fr{width:56px;flex:none;text-align:right;font-size:13px;font-weight:600;color:var(--text-soft)}
+
+/* ---- on the ground ---- */
+.ground{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:20px}
+.ground .label{letter-spacing:.12em}
+.chip{border-radius:999px;padding:4px 12px;font-size:13px;font-weight:600;border:1px dashed var(--border);background:var(--surface);color:var(--text-soft)}
+
+/* ---- departments ---- */
+.dept-grid{display:grid;gap:16px;align-items:start}
+@media (min-width:1024px){.dept-grid{grid-template-columns:1fr 1fr}}
+.dept-card{border-radius:14px;background:var(--surface);border:1px solid var(--border);padding:20px}
+@media (min-width:640px){.dept-card{padding:24px}}
+.dept-card .top{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border-subtle)}
+.dept-card .top h3{font-size:19px;font-weight:800;letter-spacing:-.02em;color:var(--text-primary)}
+.dept-card .top .cnt{font-size:13px;font-weight:600;color:var(--text-soft)}
+.dept-card .top .pc{font-size:26px;font-weight:800;line-height:1;letter-spacing:-.02em;color:var(--text-primary)}
+.dept-card ul{list-style:none;display:grid;gap:16px}
+.dept-row{display:grid;grid-template-columns:1fr auto;gap:0 16px}
+.dept-row .nm{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary)}
+.dept-row .pc{font-size:15px;font-weight:800;color:var(--text-primary)}
+.dept-row .line{grid-column:span 2;display:flex;align-items:center;gap:12px;margin-top:8px}
+.dept-row .fr{width:56px;flex:none;text-align:right;font-size:13px;font-weight:600;color:var(--text-soft)}
+.empty{font-size:14px;font-weight:500;color:var(--text-soft)}
 
 /* ---- footer ---- */
-footer{margin-top:46px;padding:22px 0 56px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3);line-height:1.7}
-footer b{color:var(--ink-2);font-weight:600}
+footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px;margin-top:40px;padding-top:20px;border-top:1px solid var(--border)}
+footer p{font-size:13px;font-weight:500;color:var(--text-soft);max-width:62ch}
+footer .badge{border-radius:999px;padding:4px 12px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;background:var(--surface-alt);border:1px solid var(--border);color:var(--text-soft)}
 
-@media (max-width:960px){.hero-row{grid-template-columns:1fr 1fr}.wrap{padding:0 20px}}
-@media (max-width:600px){.hero-row{grid-template-columns:1fr}.header h1{font-size:24px;white-space:normal}.dept-grid{grid-template-columns:1fr;padding:4px 16px 18px}.project-card-header{padding:14px 16px}.pch-stats{display:none}.toggle-bar{gap:12px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---- toggle bar ---- */
+.bars{display:flex;flex-wrap:wrap;align-items:center;gap:14px 26px;margin-bottom:28px}
+.tgroup{display:flex;align-items:center;gap:10px}
+.tlabel{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--text-soft)}
+.tabs button:disabled{color:var(--text-muted);cursor:not-allowed;background:transparent}
+.tabs.gold button.on{background:var(--accent);color:var(--text-primary)}
+.dot-sep{width:4px;height:4px;border-radius:50%;background:var(--border);flex:none;display:none}
+@media (min-width:640px){.dot-sep{display:block}}
+
+/* ---- phase badge + notice ---- */
+.pbadge{display:inline-block;border-radius:999px;padding:3px 11px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.pbadge.lite{background:var(--accent-dim);color:oklch(42% 0.1 80)}
+.pbadge.heavy{background:oklch(94% 0.045 30);color:var(--engineering-text)}
+.notice{display:flex;gap:10px;margin-top:20px;padding:13px 16px;border-radius:10px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);font-size:14px;font-weight:500;color:var(--text-secondary)}
+.notice b{font-weight:800;color:var(--text-primary)}
 
 
 </style>
 </head>
 <body>
 
-<div class="stripe"><span class="sweep"></span></div>
-
-<div class="wrap">
-  <div class="header">
-    <div>
-      <h1>Governance <span>Leaderboard</span></h1>
-      <p>Progress across all active DGC projects</p>
-    </div>
-    <div class="stamp"><span class="dot"></span><span id="stamp">Updated</span></div>
-  </div>
-
-  <div class="toggle-bar">
-    <div class="toggle-group">
-      <span class="toggle-label">Phase</span>
-      <div class="seg gold" id="segPhase">
-        <button data-v="lite">DG Lite</button>
-        <button data-v="heavy">DG Heavy</button>
-      </div>
-    </div>
-    <div class="divider-dot"></div>
-    <div class="toggle-group">
-      <span class="toggle-label">View</span>
-      <div class="seg" id="segView">
-        <button data-v="dept">Department</button>
-        <button data-v="domain">Domain</button>
+<div class="shell">
+  <div class="rail" aria-hidden="true">
+    <div class="rail-inner">
+      <div style="position:relative">
+        <div class="rail-line"></div>
+        <div class="rail-dot" id="railDot" style="top:8px"></div>
+        <ul id="railList">
+          <li data-fl="FL500"><p class="fl">FL500</p><p class="nm">Program</p></li>
+          <li data-fl="FL200"><p class="fl">FL200</p><p class="nm">Domains</p></li>
+          <li data-fl="FL050"><p class="fl">FL050</p><p class="nm">In domain</p></li>
+        </ul>
       </div>
     </div>
   </div>
 
-  <div id="notice"></div>
-  <div class="hero-row" id="heroRow"></div>
+  <div class="col">
+    <header class="head">
+      <div>
+        <p class="eyebrow">The Scion Group &middot; Data Governance Council</p>
+        <h1>Governance Leaderboard</h1>
+        <p class="sub">Task-weighted, participating combinations only &middot; snapshot <span id="stamp"></span></p>
+      </div>
+    </header>
 
-  <div class="controls-bar">
-    <div class="section-title" id="sectionTitle">Department Breakdown</div>
-    <div class="pill-group" id="segSort">
-      <button class="pill" data-v="az">A&ndash;Z</button>
-      <button class="pill" data-v="top">Top First</button>
-      <button class="pill" data-v="need">Needs Work</button>
+    <div class="bars">
+      <div class="tgroup">
+        <span class="tlabel">Phase</span>
+        <div class="tabs gold" id="tabsPhase" role="tablist" aria-label="Choose a phase">
+          <button type="button" role="tab" data-v="lite">DG Lite</button>
+          <button type="button" role="tab" data-v="heavy">DG Heavy</button>
+        </div>
+      </div>
+      <span class="dot-sep"></span>
+      <div class="tgroup">
+        <span class="tlabel">View</span>
+        <div class="tabs" id="tabsView" role="tablist" aria-label="Choose a view">
+          <button type="button" role="tab" data-v="domains">Domains</button>
+          <button type="button" role="tab" data-v="departments">Departments</button>
+        </div>
+      </div>
     </div>
+
+    <div class="readout">
+      <div class="sweep"></div>
+      <div class="readout-grid">
+        <div>
+          <p class="pbadge lite" id="phaseBadge">DG Lite</p>
+          <p class="label">FL500 &middot; All projects</p>
+          <div class="huge">
+            <p class="n tnum" id="programPct">0%</p>
+            <p class="p" id="programNote"></p>
+          </div>
+        </div>
+        <div class="topics">
+          <div class="bar overall" style="height:12px"><span id="programBar"></span></div>
+          <div class="rows" id="topicRows"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="notice"></div>
+    <div class="section" id="view"></div>
+
+    <footer>
+      <p id="footNote"></p>
+      <p class="badge">DGC Hub</p>
+    </footer>
   </div>
-
-  <div class="project-grid" id="projectGrid"></div>
-
-  <footer>
-    <p>
-      <b>Score</b> is weighted progress: a finished task counts full, a task in flight counts half, everything else counts zero.
-      Regenerated from live ClickUp data every weekday at <b>7:00&nbsp;AM Central</b> by GitHub Actions.
-    </p>
-  </footer>
 </div>
 
 
 <script>
 
 window.DGC_RENDER = function(DATA){
-  var state = { phase:'lite', view:'dept', sort:'az' };
+  var state = { phase:DATA.order[0], view:'domains', open:null };
   var $ = function(id){ return document.getElementById(id); };
 
-  var COLORS = {};
-  DATA.projects.forEach(function(p){ COLORS[p.key] = p.color; });
-
-  function score(a){ return a.total ? ((a.done + a.ip/2) / a.total) * 100 : 0; }
-  function fmt(n){
-    if(n === 0) return '0';
-    if(n < 1) return n.toFixed(1);
-    return Math.round(n).toString();
+  function phase(){ return DATA.phases[state.phase]; }
+  function pct(done,total){ return total ? Math.round((done/total)*100) : 0; }
+  function esc(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  /* ---- hero cards ---- */
-  var COLOR_MAP = {};
-  var ABBREVS = {};
-  DATA.projects.forEach(function(p,i){
-    var palette = ['blue','teal','coral','violet'];
-    COLOR_MAP[p.key] = palette[i % palette.length];
-    ABBREVS[p.key] = p.short.substring(0,2).toUpperCase();
-  });
+  var WORDING = {
+    lite:  { unit:'participating governance tasks',
+             foot:'DG Lite counts the steward governance tasks in each participating department. ' +
+                  'A task is complete when its status is in the Done or Closed category. ' +
+                  'Non-participating department/domain combinations are excluded from both numerator and denominator.' },
+    heavy: { unit:'Engineering and BI build tasks',
+             foot:'DG Heavy counts the Engineering and BI build tasks for each domain. ' +
+                  'A task is complete when its status is in the Done or Closed category. ' +
+                  'DG Heavy runs at the domain level, so it has no department breakdown.' }
+  };
+  function wording(){ return WORDING[state.phase] || WORDING.lite; }
 
-  function buildHero(){
+  /* fill every bar one frame late so the width transition actually runs */
+  function animateBars(root){
+    requestAnimationFrame(function(){
+      Array.prototype.forEach.call(root.querySelectorAll('.bar>span[data-w]'), function(el,i){
+        el.style.transitionDelay = (Math.min(i,12) * 0.06) + 's';
+        el.style.width = el.getAttribute('data-w') + '%';
+      });
+    });
+  }
+
+  function bar(value, tone, thickness){
+    return '<div class="bar ' + tone + '" style="height:' + thickness + 'px">' +
+             '<span data-w="' + value + '"></span></div>';
+  }
+  function ghost(thickness){
+    return '<div class="ghost" style="height:' + thickness + 'px"></div>';
+  }
+
+  /* ---- altitude rail ---- */
+  function altitude(){
+    if(state.view === 'departments') return 'FL500';
+    return state.open ? 'FL050' : 'FL200';
+  }
+  function syncRail(){
+    var fl = altitude();
+    var tops = { FL500:'8px', FL200:'50%', FL050:'calc(100% - 26px)' };
+    $('railDot').style.top = tops[fl];
+    Array.prototype.forEach.call($('railList').children, function(li){
+      li.classList.toggle('on', li.getAttribute('data-fl') === fl);
+    });
+  }
+
+  /* ---- FL500 ---- */
+  var countFrom = 0;
+  function buildReadout(){
+    var D = phase();
+    var target = pct(D.program.done, D.program.total);
+    var el = $('programPct'), from = countFrom, start = null, dur = 900;
+    countFrom = target;
+    function tick(now){
+      if(start === null) start = now;
+      var p = Math.min((now - start) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(from + (target - from) * eased) + '%';
+      if(p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    var badge = $('phaseBadge');
+    badge.textContent = D.label;
+    badge.className = 'pbadge ' + state.phase;
+
+    $('programNote').textContent = D.program.done + ' of ' + D.program.total + ' ' +
+      wording().unit + ' are done or closed.';
+
     var html = '';
-    DATA.projects.forEach(function(p){
-      var a = p.phases[state.phase];
-      var pct = score(a);
-      var circ = Math.PI * 36;
-      var off = circ - (circ * pct / 100);
-      var key = (state.view === 'dept') ? 'byDept' : 'byDomain';
-      var items = a[key] || a.byDomain || [];
-      var done = items.filter(function(r){ return r.total > 0 && r.done === r.total; }).length;
-      var unit = (state.phase === 'heavy' || state.view === 'domain') ? 'domains' : 'departments';
-      var color = COLOR_MAP[p.key];
-
-      html += '<div class="hero-card" data-color="' + color + '">' +
-        '<div class="phase-badge ' + (state.phase === 'lite' ? 'lite' : 'heavy') + '">' +
-          (state.phase === 'lite' ? 'DG Lite' : 'DG Heavy') +
-        '</div>' +
-        '<div class="project-label">' + p.name + '</div>' +
-        '<div class="big-number">' + fmt(pct) + '%</div>' +
-        '<div class="dept-count">' + done + '/' + items.length + ' ' + unit + ' complete</div>' +
-        '<svg class="hero-ring" viewBox="0 0 48 48">' +
-          '<circle class="track" cx="24" cy="24" r="18"/>' +
-          '<circle class="fill" cx="24" cy="24" r="18" stroke-dasharray="' + circ +
-            '" stroke-dashoffset="' + off + '" transform="rotate(-90 24 24)"/>' +
-        '</svg>' +
+    D.projects.forEach(function(p){
+      var v = pct(p.done, p.total);
+      html += '<div class="trow">' +
+        '<p class="nm">' + esc(p.short) + '</p>' +
+        '<div class="track">' + bar(v,'governance',5) + '</div>' +
+        '<p class="pc tnum">' + v + '%</p>' +
       '</div>';
     });
-    $('heroRow').innerHTML = html;
+    $('topicRows').innerHTML = html;
+    $('programBar').style.width = '0%';
+    $('programBar').setAttribute('data-w', target);
+    animateBars(document.querySelector('.readout'));
   }
 
-  /* ---- project cards with dept grids ---- */
-  function sortedItems(items){
-    var c = items.slice();
-    if(state.sort === 'az') c.sort(function(a,b){ return a.name.localeCompare(b.name); });
-    else if(state.sort === 'top') c.sort(function(a,b){ return score(b) - score(a) || a.name.localeCompare(b.name); });
-    else c.sort(function(a,b){ return score(a) - score(b) || b.total - a.total || a.name.localeCompare(b.name); });
-    return c;
-  }
+  /* ---- FL200 + FL050 ---- */
+  function buildDomains(){
+    var D = phase();
+    var programPct = pct(D.program.done, D.program.total);
 
-  function buildProjects(){
-    var effectiveView = (state.phase === 'heavy') ? 'domain' : state.view;
-    var key = (effectiveView === 'dept') ? 'byDept' : 'byDomain';
-    var label = (effectiveView === 'dept') ? 'departments' : 'domains';
+    var html = '<div class="sec-head">' +
+        '<h2>FL200 &middot; Domains, all projects combined</h2>' +
+        '<p>Click a domain to descend to project level</p>' +
+      '</div><div class="domains">';
 
-    $('sectionTitle').textContent = (effectiveView === 'dept') ? 'Department Breakdown' : 'Domain Breakdown';
+    D.domains.forEach(function(d){
+      var v = pct(d.done, d.total);
+      var lagging = v < programPct;
+      var isOpen = state.open === d.name;
+      var n = D.projects.length;
 
-    var html = '';
-    DATA.projects.forEach(function(p){
-      var a = p.phases[state.phase];
-      var items = sortedItems(a[key] || a.byDomain || []);
-      var done = items.filter(function(r){ return r.total > 0 && r.done === r.total; }).length;
-      var zero = items.filter(function(r){ return r.done === 0 && r.ip === 0; }).length;
-      var active = items.length - done - zero;
-      var abbrev = ABBREVS[p.key];
+      html += '<div class="drow' + (isOpen ? ' open' : '') + '" data-domain="' + esc(d.name) + '">' +
+        '<button type="button" class="dhead" aria-expanded="' + isOpen + '">' +
+          '<span class="dname">' +
+            '<span class="t">' + esc(d.name) + '</span>' +
+            (lagging ? '<span class="flag">below program</span>' : '') +
+          '</span>' +
+          '<span class="dmid">' +
+            bar(v, lagging ? 'lag' : 'governance', 10) +
+            '<span class="cap">' + d.live + ' of ' + n + ' project' + (n === 1 ? '' : 's') + ' participating</span>' +
+          '</span>' +
+          '<span class="dpct tnum">' + v + '%</span>' +
+          '<span class="dright">' +
+            '<span class="dfrac tnum">' + d.done + '/' + d.total + '</span>' +
+            '<span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>' +
+          '</span>' +
+        '</button>' +
+        '<div class="descent"><div class="descent-clip"><div class="descent-in">' +
+          '<p class="label">FL050 &middot; ' + esc(d.name) + ' by project</p>' +
+          '<div class="pgrid">';
 
-      html += '<div class="project-card open" data-project="' + p.key + '">' +
-        '<div class="project-card-header" onclick="this.closest(\'.project-card\').classList.toggle(\'open\')">' +
-          '<div class="pch-left">' +
-            '<div class="color-badge">' + abbrev + '</div>' +
-            '<div class="pch-info">' +
-              '<div class="pch-name">' + p.name + '</div>' +
-              '<div class="pch-sub">' + items.length + ' ' + label + ' tracked</div>' +
-            '</div>' +
+      D.projects.forEach(function(p){
+        var cell = d.byProject[p.key];
+        var cv = cell ? pct(cell.done, cell.total) : null;
+        html += '<div class="pcell">' +
+          '<p class="nm">' + esc(p.name) + '</p>' +
+          '<p class="pc tnum' + (cell ? '' : ' out') + '">' + (cell ? cv + '%' : 'not in scope') + '</p>' +
+          '<div class="line">' +
+            (cell ? bar(cv,'governance',6) : ghost(6)) +
+            '<span class="fr tnum">' + (cell ? cell.done + '/' + cell.total : '&mdash;') + '</span>' +
           '</div>' +
-          '<div class="pch-right">' +
-            '<div class="pch-stats">' +
-              '<div class="pch-stat"><div class="stat-val g">' + done + '</div><div class="stat-label">Done</div></div>' +
-              '<div class="pch-stat"><div class="stat-val">' + active + '</div><div class="stat-label">Active</div></div>' +
-              '<div class="pch-stat"><div class="stat-val r">' + zero + '</div><div class="stat-label">Not Started</div></div>' +
-            '</div>' +
-            '<button class="chevron-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></button>' +
-          '</div>' +
-        '</div>' +
-        '<div class="project-card-body"><div class="project-card-body-inner"><div class="dept-grid">';
-
-      items.forEach(function(d){
-        var s = score(d);
-        var cls = (d.total > 0 && d.done === d.total) ? 'complete' : (d.done === 0 && d.ip === 0) ? 'zero' : '';
-        html += '<div class="dept-tile ' + cls + '">' +
-          '<div class="dept-tile-top">' +
-            '<span class="dept-tile-name">' + d.name + '</span>' +
-            '<span class="dept-tile-pct">' + fmt(s) + '%</span>' +
-          '</div>' +
-          '<div class="dept-tile-bar"><div class="dept-tile-bar-fill" style="width:' + s + '%"></div></div>' +
         '</div>';
       });
 
-      html += '</div></div></div></div>';
+      html += '</div></div></div></div></div>';
     });
-    $('projectGrid').innerHTML = html;
-  }
 
-  function buildNotice(){
-    $('notice').innerHTML = (state.phase === 'heavy' && state.view === 'dept')
-      ? '<div class="notice"><span><strong>DG Heavy runs at the domain level.</strong> ' +
-        'It tracks Engineering and BI build tasks per domain, so there is no department breakdown in Heavy mode.</span></div>'
-      : '';
-  }
+    html += '</div>';
 
-  function syncSegs(){
-    [['segPhase','phase'],['segView','view'],['segSort','sort']].forEach(function(pair){
-      Array.prototype.forEach.call($(pair[0]).querySelectorAll('button,[data-v]'), function(b){
-        b.classList.toggle(b.classList.contains('pill') ? 'active' : 'on',
-          b.getAttribute('data-v') === state[pair[1]]);
+    if(D.grounded.length){
+      html += '<div class="ground"><span class="label">On the ground &middot; no participating combinations yet</span>';
+      D.grounded.forEach(function(name){
+        html += '<span class="chip">' + esc(name) + '</span>';
       });
+      html += '</div>';
+    }
+    return html;
+  }
+
+  /* ---- departments ---- */
+  function buildDepartments(){
+    var D = phase();
+    var html = '<div class="sec-head">' +
+        '<h2>Departments &middot; by project</h2>' +
+        '<p>Governance tasks only, participating domains only</p>' +
+      '</div><div class="dept-grid">';
+
+    D.projects.forEach(function(p){
+      var rows = D.departments[p.key] || [];
+      html += '<div class="dept-card" data-project="' + esc(p.key) + '">' +
+        '<div class="top"><div>' +
+          '<h3>' + esc(p.name) + '</h3>' +
+          '<p class="cnt">' + rows.length + ' participating ' +
+            (rows.length === 1 ? 'department' : 'departments') + '</p>' +
+        '</div><p class="pc tnum">' + pct(p.done, p.total) + '%</p></div>';
+
+      if(!rows.length){
+        html += '<p class="empty">No participating departments yet.</p>';
+      } else {
+        html += '<ul>';
+        rows.forEach(function(r){
+          var v = pct(r.done, r.total);
+          html += '<li class="dept-row">' +
+            '<p class="nm">' + esc(r.name) + '</p>' +
+            '<p class="pc tnum">' + v + '%</p>' +
+            '<div class="line">' + bar(v,'governance',6) +
+              '<span class="fr tnum">' + r.done + '/' + r.total + '</span>' +
+            '</div>' +
+          '</li>';
+        });
+        html += '</ul>';
+      }
+      html += '</div>';
     });
-    var deptBtn = $('segView').querySelector('[data-v="dept"]');
-    if(deptBtn) deptBtn.disabled = (state.phase === 'heavy');
+    return html + '</div>';
+  }
+
+  /* ---- render ---- */
+  function syncTabs(){
+    var D = phase();
+    Array.prototype.forEach.call($('tabsPhase').children, function(b){
+      var on = b.getAttribute('data-v') === state.phase;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-selected', on);
+    });
+    Array.prototype.forEach.call($('tabsView').children, function(b){
+      var on = b.getAttribute('data-v') === state.view;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-selected', on);
+      if(b.getAttribute('data-v') === 'departments'){
+        b.disabled = !D.depts;
+        b.title = D.depts ? '' : D.label + ' has no department breakdown';
+      }
+    });
   }
 
   function render(){
-    if(state.phase === 'heavy') state.view = 'domain';
-    syncSegs();
-    buildHero();
-    buildNotice();
-    buildProjects();
+    var D = phase();
+    if(!D.depts && state.view === 'departments') state.view = 'domains';
+
+    syncTabs();
+
+    $('notice').innerHTML = (!D.depts)
+      ? '<div class="notice"><span><b>' + esc(D.label) + ' runs at the domain level.</b> ' +
+        'It tracks Engineering and BI build tasks per domain, so there is no department breakdown here. ' +
+        'Switch to DG Lite for the department view.</span></div>'
+      : '';
+
+    $('footNote').textContent = wording().foot +
+      ' Rebuilt from live ClickUp data every weekday at 7:00 AM Central.';
+
+    var host = $('view');
+    host.innerHTML = (state.view === 'domains') ? buildDomains() : buildDepartments();
+
+    Array.prototype.forEach.call(host.querySelectorAll('.drow'), function(row){
+      row.querySelector('.dhead').addEventListener('click', function(){
+        var name = row.getAttribute('data-domain');
+        state.open = (state.open === name) ? null : name;
+        render();
+      });
+    });
+
+    syncRail();
+    animateBars(host);
   }
 
-  /* ---- wire up ---- */
-  [['segPhase','phase'],['segView','view'],['segSort','sort']].forEach(function(pair){
-    $(pair[0]).addEventListener('click', function(e){
-      var b = e.target.closest('button,[data-v]');
-      if(!b || b.disabled) return;
-      state[pair[1]] = b.getAttribute('data-v');
-      render();
-    });
+  $('tabsPhase').addEventListener('click', function(e){
+    var b = e.target.closest('button[data-v]');
+    if(!b || b.disabled || b.getAttribute('data-v') === state.phase) return;
+    state.phase = b.getAttribute('data-v');
+    state.open = null;
+    buildReadout();
+    render();
   });
 
-  $('stamp').textContent = 'Updated ' + DATA.generatedLabel;
+  $('tabsView').addEventListener('click', function(e){
+    var b = e.target.closest('button[data-v]');
+    if(!b || b.disabled || b.getAttribute('data-v') === state.view) return;
+    state.view = b.getAttribute('data-v');
+    state.open = null;
+    render();
+  });
+
+  $('stamp').textContent = DATA.generatedLabel;
+  buildReadout();
   render();
 };
 
 
 </script>
-<script>DGC_RENDER({"generatedAt":"2026-09-14T09:44:43.100591-05:00","generatedLabel":"Sep 14, 2026 9:44 AM CT","projects":[{"key":"cfi-consolidation","name":"CFI Consolidation","short":"CFI","color":"#9b59b6","phases":{"lite":{"total":25,"ns":13,"ip":6,"done":6,"byDept":[{"name":"REVENUE MGT","total":24,"ns":12,"ip":6,"done":6}],"byDomain":[{"name":"Asset","total":4,"ns":2,"ip":1,"done":1},{"name":"Commerce","total":4,"ns":2,"ip":1,"done":1},{"name":"Customer","total":4,"ns":2,"ip":1,"done":1},{"name":"Financials","total":4,"ns":2,"ip":1,"done":1},{"name":"Investor","total":4,"ns":2,"ip":1,"done":1},{"name":"Market","total":4,"ns":2,"ip":1,"done":1}]},"heavy":{"total":120,"ns":120,"ip":0,"done":0,"byDept":[],"byDomain":[{"name":"Asset","total":10,"ns":10,"ip":0,"done":0},{"name":"Commerce","total":10,"ns":10,"ip":0,"done":0},{"name":"Customer","total":10,"ns":10,"ip":0,"done":0},{"name":"Facilities","total":10,"ns":10,"ip":0,"done":0},{"name":"Financials","total":10,"ns":10,"ip":0,"done":0},{"name":"Investor","total":10,"ns":10,"ip":0,"done":0},{"name":"Market","total":10,"ns":10,"ip":0,"done":0},{"name":"Operations","total":10,"ns":10,"ip":0,"done":0},{"name":"People","total":10,"ns":10,"ip":0,"done":0},{"name":"Procurement","total":10,"ns":10,"ip":0,"done":0},{"name":"Technology","total":10,"ns":10,"ip":0,"done":0},{"name":"Utilities","total":10,"ns":10,"ip":0,"done":0}]}}},{"key":"non-revenue-inventory","name":"Non-Revenue Inventory","short":"Non-Rev","color":"#ff7800","phases":{"lite":{"total":99,"ns":7,"ip":17,"done":75,"byDept":[{"name":"ACCOUNTS PAYABLE","total":5,"ns":0,"ip":0,"done":5},{"name":"BRAND","total":5,"ns":0,"ip":0,"done":5},{"name":"BUSINESS OPS","total":12,"ns":0,"ip":0,"done":12},{"name":"CAPITAL","total":1,"ns":0,"ip":0,"done":1},{"name":"CORPORATE ACCTG","total":6,"ns":0,"ip":0,"done":6},{"name":"FP&A","total":3,"ns":0,"ip":0,"done":3},{"name":"INVESTMENTS","total":5,"ns":0,"ip":0,"done":5},{"name":"PROGRAM MGT","total":5,"ns":0,"ip":0,"done":5},{"name":"PROPERTY ACCTG","total":5,"ns":0,"ip":0,"done":5},{"name":"REVENUE MGT","total":24,"ns":0,"ip":6,"done":18},{"name":"SALES","total":24,"ns":6,"ip":11,"done":7},{"name":"TAX","total":3,"ns":0,"ip":0,"done":3}],"byDomain":[{"name":"Asset","total":13,"ns":0,"ip":1,"done":12},{"name":"Commerce","total":10,"ns":1,"ip":3,"done":6},{"name":"Customer","total":10,"ns":1,"ip":3,"done":6},{"name":"Facilities","total":5,"ns":0,"ip":0,"done":5},{"name":"Financials","total":16,"ns":1,"ip":3,"done":12},{"name":"Investor","total":12,"ns":1,"ip":3,"done":8},{"name":"Market","total":11,"ns":1,"ip":3,"done":7},{"name":"Operations","total":12,"ns":1,"ip":1,"done":10},{"name":"People","total":2,"ns":0,"ip":0,"done":2},{"name":"Procurement","total":3,"ns":0,"ip":0,"done":3},{"name":"Technology","total":2,"ns":0,"ip":0,"done":2},{"name":"Utilities","total":2,"ns":0,"ip":0,"done":2}]},"heavy":{"total":120,"ns":120,"ip":0,"done":0,"byDept":[],"byDomain":[{"name":"Asset","total":10,"ns":10,"ip":0,"done":0},{"name":"Commerce","total":10,"ns":10,"ip":0,"done":0},{"name":"Customer","total":10,"ns":10,"ip":0,"done":0},{"name":"Facilities","total":10,"ns":10,"ip":0,"done":0},{"name":"Financials","total":10,"ns":10,"ip":0,"done":0},{"name":"Investor","total":10,"ns":10,"ip":0,"done":0},{"name":"Market","total":10,"ns":10,"ip":0,"done":0},{"name":"Operations","total":10,"ns":10,"ip":0,"done":0},{"name":"People","total":10,"ns":10,"ip":0,"done":0},{"name":"Procurement","total":10,"ns":10,"ip":0,"done":0},{"name":"Technology","total":10,"ns":10,"ip":0,"done":0},{"name":"Utilities","total":10,"ns":10,"ip":0,"done":0}]}}},{"key":"parking-consolidation","name":"Parking Consolidation","short":"Parking","color":"#0f68f9","phases":{"lite":{"total":25,"ns":13,"ip":6,"done":6,"byDept":[{"name":"REVENUE MGT","total":24,"ns":12,"ip":6,"done":6}],"byDomain":[{"name":"Asset","total":4,"ns":2,"ip":1,"done":1},{"name":"Commerce","total":4,"ns":2,"ip":1,"done":1},{"name":"Customer","total":4,"ns":2,"ip":1,"done":1},{"name":"Financials","total":4,"ns":2,"ip":1,"done":1},{"name":"Investor","total":4,"ns":2,"ip":1,"done":1},{"name":"Market","total":4,"ns":2,"ip":1,"done":1}]},"heavy":{"total":120,"ns":120,"ip":0,"done":0,"byDept":[],"byDomain":[{"name":"Asset","total":10,"ns":10,"ip":0,"done":0},{"name":"Commerce","total":10,"ns":10,"ip":0,"done":0},{"name":"Customer","total":10,"ns":10,"ip":0,"done":0},{"name":"Facilities","total":10,"ns":10,"ip":0,"done":0},{"name":"Financials","total":10,"ns":10,"ip":0,"done":0},{"name":"Investor","total":10,"ns":10,"ip":0,"done":0},{"name":"Market","total":10,"ns":10,"ip":0,"done":0},{"name":"Operations","total":10,"ns":10,"ip":0,"done":0},{"name":"People","total":10,"ns":10,"ip":0,"done":0},{"name":"Procurement","total":10,"ns":10,"ip":0,"done":0},{"name":"Technology","total":10,"ns":10,"ip":0,"done":0},{"name":"Utilities","total":10,"ns":10,"ip":0,"done":0}]}}},{"key":"properties","name":"Properties","short":"Properties","color":"#2ecd6f","phases":{"lite":{"total":177,"ns":137,"ip":0,"done":40,"byDept":[{"name":"ACCOUNTS PAYABLE","total":20,"ns":15,"ip":0,"done":5},{"name":"BRAND","total":20,"ns":19,"ip":0,"done":1},{"name":"BUSINESS OPS","total":48,"ns":36,"ip":0,"done":12},{"name":"CORPORATE ACCTG","total":24,"ns":18,"ip":0,"done":6},{"name":"FP&A","total":12,"ns":9,"ip":0,"done":3},{"name":"PROGRAM MGT","total":20,"ns":15,"ip":0,"done":5},{"name":"PROPERTY ACCTG","total":20,"ns":15,"ip":0,"done":5},{"name":"TAX","total":12,"ns":9,"ip":0,"done":3}],"byDomain":[{"name":"Asset","total":32,"ns":24,"ip":0,"done":8},{"name":"Commerce","total":8,"ns":6,"ip":0,"done":2},{"name":"Customer","total":8,"ns":7,"ip":0,"done":1},{"name":"Facilities","total":20,"ns":16,"ip":0,"done":4},{"name":"Financials","total":28,"ns":21,"ip":0,"done":7},{"name":"Investor","total":12,"ns":9,"ip":0,"done":3},{"name":"Market","total":8,"ns":7,"ip":0,"done":1},{"name":"Operations","total":24,"ns":19,"ip":0,"done":5},{"name":"People","total":8,"ns":6,"ip":0,"done":2},{"name":"Procurement","total":12,"ns":9,"ip":0,"done":3},{"name":"Technology","total":8,"ns":6,"ip":0,"done":2},{"name":"Utilities","total":8,"ns":6,"ip":0,"done":2}]},"heavy":{"total":120,"ns":120,"ip":0,"done":0,"byDept":[],"byDomain":[{"name":"Asset","total":10,"ns":10,"ip":0,"done":0},{"name":"Commerce","total":10,"ns":10,"ip":0,"done":0},{"name":"Customer","total":10,"ns":10,"ip":0,"done":0},{"name":"Facilities","total":10,"ns":10,"ip":0,"done":0},{"name":"Financials","total":10,"ns":10,"ip":0,"done":0},{"name":"Investor","total":10,"ns":10,"ip":0,"done":0},{"name":"Market","total":10,"ns":10,"ip":0,"done":0},{"name":"Operations","total":10,"ns":10,"ip":0,"done":0},{"name":"People","total":10,"ns":10,"ip":0,"done":0},{"name":"Procurement","total":10,"ns":10,"ip":0,"done":0},{"name":"Technology","total":10,"ns":10,"ip":0,"done":0},{"name":"Utilities","total":10,"ns":10,"ip":0,"done":0}]}}}],"totals":{"tasks":806,"inFlight":29,"done":127,"topics":4,"lists":8}});</script>
+<script>DGC_RENDER({"order":["lite","heavy"],"phases":{"lite":{"id":"lite","label":"DG Lite","depts":true,"projects":[{"key":"cfi-consolidation","name":"CFI Consolidation","short":"CFI","done":6,"total":25},{"key":"parking-consolidation","name":"Parking Consolidation","short":"Parking","done":6,"total":25},{"key":"non-revenue-inventory","name":"Non-Revenue Inventory","short":"NRI","done":75,"total":99},{"key":"properties","name":"Properties","short":"Properties","done":40,"total":177}],"domains":[{"name":"Operations","byProject":{"cfi-consolidation":null,"parking-consolidation":null,"non-revenue-inventory":{"done":10,"total":12},"properties":{"done":5,"total":24}},"done":15,"total":36,"live":2},{"name":"Asset","byProject":{"cfi-consolidation":{"done":1,"total":4},"parking-consolidation":{"done":1,"total":4},"non-revenue-inventory":{"done":12,"total":13},"properties":{"done":8,"total":32}},"done":22,"total":53,"live":4},{"name":"Investor","byProject":{"cfi-consolidation":{"done":1,"total":4},"parking-consolidation":{"done":1,"total":4},"non-revenue-inventory":{"done":8,"total":12},"properties":{"done":3,"total":12}},"done":13,"total":32,"live":4},{"name":"Financials","byProject":{"cfi-consolidation":{"done":1,"total":4},"parking-consolidation":{"done":1,"total":4},"non-revenue-inventory":{"done":12,"total":16},"properties":{"done":7,"total":28}},"done":21,"total":52,"live":4},{"name":"People","byProject":{"cfi-consolidation":null,"parking-consolidation":null,"non-revenue-inventory":{"done":2,"total":2},"properties":{"done":2,"total":8}},"done":4,"total":10,"live":2},{"name":"Procurement","byProject":{"cfi-consolidation":null,"parking-consolidation":null,"non-revenue-inventory":{"done":3,"total":3},"properties":{"done":3,"total":12}},"done":6,"total":15,"live":2},{"name":"Technology","byProject":{"cfi-consolidation":null,"parking-consolidation":null,"non-revenue-inventory":{"done":2,"total":2},"properties":{"done":2,"total":8}},"done":4,"total":10,"live":2},{"name":"Utilities","byProject":{"cfi-consolidation":null,"parking-consolidation":null,"non-revenue-inventory":{"done":2,"total":2},"properties":{"done":2,"total":8}},"done":4,"total":10,"live":2},{"name":"Commerce","byProject":{"cfi-consolidation":{"done":1,"total":4},"parking-consolidation":{"done":1,"total":4},"non-revenue-inventory":{"done":6,"total":10},"properties":{"done":2,"total":8}},"done":10,"total":26,"live":4},{"name":"Market","byProject":{"cfi-consolidation":{"done":1,"total":4},"parking-consolidation":{"done":1,"total":4},"non-revenue-inventory":{"done":7,"total":11},"properties":{"done":1,"total":8}},"done":10,"total":27,"live":4},{"name":"Facilities","byProject":{"cfi-consolidation":null,"parking-consolidation":null,"non-revenue-inventory":{"done":5,"total":5},"properties":{"done":4,"total":20}},"done":9,"total":25,"live":2},{"name":"Customer","byProject":{"cfi-consolidation":{"done":1,"total":4},"parking-consolidation":{"done":1,"total":4},"non-revenue-inventory":{"done":6,"total":10},"properties":{"done":1,"total":8}},"done":9,"total":26,"live":4}],"grounded":[],"departments":{"cfi-consolidation":[{"name":"REVENUE MGT","done":6,"total":24}],"parking-consolidation":[{"name":"REVENUE MGT","done":6,"total":24}],"non-revenue-inventory":[{"name":"ACCOUNTS PAYABLE","done":5,"total":5},{"name":"BRAND","done":5,"total":5},{"name":"BUSINESS OPS","done":12,"total":12},{"name":"CAPITAL","done":1,"total":1},{"name":"CORPORATE ACCTG","done":6,"total":6},{"name":"FP&A","done":3,"total":3},{"name":"INVESTMENTS","done":5,"total":5},{"name":"PROGRAM MGT","done":5,"total":5},{"name":"PROPERTY ACCTG","done":5,"total":5},{"name":"TAX","done":3,"total":3},{"name":"REVENUE MGT","done":18,"total":24},{"name":"SALES","done":7,"total":24}],"properties":[{"name":"ACCOUNTS PAYABLE","done":5,"total":20},{"name":"BUSINESS OPS","done":12,"total":48},{"name":"CORPORATE ACCTG","done":6,"total":24},{"name":"FP&A","done":3,"total":12},{"name":"PROGRAM MGT","done":5,"total":20},{"name":"PROPERTY ACCTG","done":5,"total":20},{"name":"TAX","done":3,"total":12},{"name":"BRAND","done":1,"total":20}]},"program":{"done":127,"total":326}},"heavy":{"id":"heavy","label":"DG Heavy","depts":false,"projects":[{"key":"cfi-consolidation","name":"CFI Consolidation","short":"CFI","done":0,"total":120},{"key":"parking-consolidation","name":"Parking Consolidation","short":"Parking","done":0,"total":120},{"key":"non-revenue-inventory","name":"Non-Revenue Inventory","short":"NRI","done":0,"total":120},{"key":"properties","name":"Properties","short":"Properties","done":0,"total":120}],"domains":[{"name":"Asset","byProject":{"cfi-consolidation":{"done":0,"total":10},"parking-consolidation":{"done":0,"total":10},"non-revenue-inventory":{"done":0,"total":10},"properties":{"done":0,"total":10}},"done":0,"total":40,"live":4},{"name":"Commerce","byProject":{"cfi-consolidation":{"done":0,"total":10},"parking-consolidation":{"done":0,"total":10},"non-revenue-inventory":{"done":0,"total":10},"properties":{"done":0,"total":10}},"done":0,"total":40,"live":4},{"name":"Customer","byProject":{"cfi-consolidation":{"done":0,"total":10},"parking-consolidation":{"done":0,"total":10},"non-revenue-inventory":{"done":0,"total":10},"properties":{"done":0,"total":10}},"done":0,"total":40,"live":4},{"name":"Facilities","byProject":{"cfi-consolidation":{"done":0,"total":10},"parking-consolidation":{"done":0,"total":10},"non-revenue-inventory":{"done":0,"total":10},"properties":{"done":0,"total":10}},"done":0,"total":40,"live":4},{"name":"Financials","byProject":{"cfi-consolidation":{"done":0,"total":10},"parking-consolidation":{"done":0,"total":10},"non-revenue-inventory":{"done":0,"total":10},"properties":{"done":0,"total":10}},"done":0,"total":40,"live":4},{"name":"Investor","byProject":{"cfi-consolidation":{"done":0,"total":10},"parking-consolidation":{"done":0,"total":10},"non-revenue-inventory":{"done":0,"total":10},"properties":{"done":0,"total":10}},"done":0,"total":40,"live":4},{"name":"Market","byProject":{"cfi-consolidation":{"done":0,"total":10},"parking-consolidation":{"done":0,"total":10},"non-revenue-inventory":{"done":0,"total":10},"properties":{"done":0,"total":10}},"done":0,"total":40,"live":4},{"name":"Operations","byProject":{"cfi-consolidation":{"done":0,"total":10},"parking-consolidation":{"done":0,"total":10},"non-revenue-inventory":{"done":0,"total":10},"properties":{"done":0,"total":10}},"done":0,"total":40,"live":4},{"name":"People","byProject":{"cfi-consolidation":{"done":0,"total":10},"parking-consolidation":{"done":0,"total":10},"non-revenue-inventory":{"done":0,"total":10},"properties":{"done":0,"total":10}},"done":0,"total":40,"live":4},{"name":"Procurement","byProject":{"cfi-consolidation":{"done":0,"total":10},"parking-consolidation":{"done":0,"total":10},"non-revenue-inventory":{"done":0,"total":10},"properties":{"done":0,"total":10}},"done":0,"total":40,"live":4},{"name":"Technology","byProject":{"cfi-consolidation":{"done":0,"total":10},"parking-consolidation":{"done":0,"total":10},"non-revenue-inventory":{"done":0,"total":10},"properties":{"done":0,"total":10}},"done":0,"total":40,"live":4},{"name":"Utilities","byProject":{"cfi-consolidation":{"done":0,"total":10},"parking-consolidation":{"done":0,"total":10},"non-revenue-inventory":{"done":0,"total":10},"properties":{"done":0,"total":10}},"done":0,"total":40,"live":4}],"grounded":[],"departments":{},"program":{"done":0,"total":480}}},"generatedAt":"2026-09-14T09:56:05.033927-05:00","generatedLabel":"Mon Sep 14, 2026 - 9:56 AM CT"});</script>
 </body>
 </html>
