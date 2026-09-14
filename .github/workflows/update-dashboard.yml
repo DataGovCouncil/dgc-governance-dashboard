@@ -2,7 +2,18 @@ name: Update DGC Governance Leaderboard
 
 on:
   schedule:
-    - cron: '0 12 * * 1-5'
+    # Every day, weekends and holidays included.
+    #
+    # 10:41 UTC = 5:41 AM Central in summer, 4:41 AM in winter.
+    # Two deliberate choices here:
+    #   * An odd minute, not :00. GitHub's scheduler is heavily oversubscribed
+    #     at the top of the hour, which is what pushed the old 7:00 AM run out
+    #     to late morning. Off-peak minutes normally start within a few minutes.
+    #   * Scheduled early, so even a long queue delay still lands in the morning.
+    # GitHub cron is always UTC and never follows daylight saving, so the local
+    # clock time shifts by an hour in November. The page always prints the real
+    # refresh time, so the site stays truthful either way.
+    - cron: '41 10 * * *'
   workflow_dispatch:
 
 jobs:
@@ -10,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      issues: write
 
     steps:
       - name: Checkout repository
@@ -37,3 +49,13 @@ jobs:
             echo "Push attempt $i failed, retrying in 5s..."
             sleep 5
           done
+
+      - name: Open an issue if the refresh failed
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue create \
+            --title "Dashboard refresh failed $(date -u +'%Y-%m-%d %H:%M UTC')" \
+            --body "The scheduled DGC Governance Leaderboard refresh did not finish, so the site is still showing the last good numbers. Full log: $RUN_URL"
