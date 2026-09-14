@@ -8,10 +8,9 @@ Needs one environment variable: CLICKUP_API_TOKEN (a pk_... personal token).
 Everything about the design lives in this file. Editing index.html directly
 will work until the next scheduled run overwrites it. Edit this instead.
 
-Design: the three-altitude Governance Leaderboard.
-  FL500 - the whole program in one number.
-  FL200 - every domain rolled up across all topics, ranked.
-  FL050 - one domain descended into its topics (click a domain row).
+Design: the Governance Leaderboard.
+  A program readout at the top, a ranked domain list below it, and each
+  domain opens to show its topics. Departments sit on a toggle.
 
 Two phase tabs:
   DG Lite  - steward governance tasks, scored by department and by domain.
@@ -27,6 +26,11 @@ import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
 
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:           # Python < 3.9
+    ZoneInfo = None
+
 # ---------------------------------------------------------------- settings
 
 SPACE_ID = "90176662768"          # DGC Hub
@@ -39,7 +43,7 @@ DISPLAY_NAMES = {
     "Property": "Properties",
 }
 
-# Folder name -> the short label used on the FL500 readout rows.
+# Folder name -> the short label used on the program readout rows.
 SHORT_NAMES = {
     "Property": "Properties",
     "CFI Consolidation": "CFI",
@@ -73,8 +77,12 @@ ALL_DOMAINS = [
 DEPT_FIELD = "Department"
 DOMAIN_FIELD = "Domain"
 
-CENTRAL = timezone(timedelta(hours=-5))   # CDT; CST half the year, close enough
-                                          # for a timestamp label.
+# Real Chicago time, so the stamp stays correct across daylight saving.
+# Falls back to a fixed CDT offset only if the tz database is missing.
+try:
+    CENTRAL = ZoneInfo("America/Chicago") if ZoneInfo else timezone(timedelta(hours=-5))
+except Exception:
+    CENTRAL = timezone(timedelta(hours=-5))
 
 # ---------------------------------------------------------------- api
 
@@ -318,27 +326,8 @@ body{
   padding:40px 20px;
 }
 @media (min-width:640px){body{padding:56px 40px}}
-.shell{max-width:1180px;margin:0 auto;display:flex;gap:24px}
-.col{min-width:0;flex:1}
+.shell{max-width:1180px;margin:0 auto}
 .tnum{font-variant-numeric:tabular-nums}
-
-/* ---- altitude rail ---- */
-.rail{position:relative;width:104px;flex:none;display:none}
-@media (min-width:1024px){.rail{display:block}}
-.rail-inner{position:sticky;top:48px;padding-left:4px}
-.rail-line{position:absolute;left:10px;top:8px;bottom:8px;width:1px;background:var(--border)}
-.rail-dot{
-  position:absolute;left:6px;width:9px;height:9px;border-radius:50%;
-  background:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);
-  transition:top .5s cubic-bezier(.22,1,.36,1);
-}
-.rail ul{list-style:none}
-.rail li{padding-left:24px}
-.rail li+li{margin-top:56px}
-.rail .fl{font-size:13px;font-weight:800;letter-spacing:.08em;color:var(--text-dim);transition:color .3s}
-.rail .nm{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);transition:color .3s}
-.rail li.on .fl{color:var(--text-primary)}
-.rail li.on .nm{color:var(--text-soft)}
 
 /* ---- header ---- */
 .head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px 32px;margin-bottom:32px}
@@ -363,7 +352,7 @@ h1{font-size:38px;font-weight:800;line-height:1.05;letter-spacing:-.035em;margin
 .bar.lag>span{background:linear-gradient(90deg,var(--engineering) 0%,oklch(74% 0.15 40) 100%)}
 .ghost{width:100%;border-radius:999px;background-image:repeating-linear-gradient(115deg,var(--border) 0 4px,transparent 4px 9px)}
 
-/* ---- FL500 readout ---- */
+/* ---- program readout ---- */
 .readout{position:relative;overflow:hidden;border-radius:16px;background:var(--surface);border:1px solid var(--border);padding:28px 20px}
 @media (min-width:640px){.readout{padding:32px 36px}}
 .readout .sweep{
@@ -392,7 +381,7 @@ h1{font-size:38px;font-weight:800;line-height:1.05;letter-spacing:-.035em;margin
 .sec-head h2{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-secondary)}
 .sec-head p{font-size:13px;font-weight:500;color:var(--text-soft)}
 
-/* ---- FL200 domain rows ---- */
+/* ---- domain rows ---- */
 .domains{overflow:hidden;border-radius:14px;background:var(--surface);border:1px solid var(--border)}
 .drow+.drow{border-top:1px solid var(--border-subtle)}
 .dhead{
@@ -422,7 +411,7 @@ h1{font-size:38px;font-weight:800;line-height:1.05;letter-spacing:-.035em;margin
 .drow.open .chev{transform:rotate(180deg)}
 .chev svg{width:14px;height:14px}
 
-/* ---- FL050 descent ---- */
+/* ---- open domain panel ---- */
 .descent{display:grid;grid-template-rows:0fr;transition:grid-template-rows .42s cubic-bezier(.22,1,.36,1)}
 .drow.open .descent{grid-template-rows:1fr}
 .descent-clip{overflow:hidden}
@@ -488,73 +477,57 @@ footer .badge{border-radius:999px;padding:4px 12px;font-size:12px;font-weight:80
 
 BODY = r'''
 <div class="shell">
-  <div class="rail" aria-hidden="true">
-    <div class="rail-inner">
-      <div style="position:relative">
-        <div class="rail-line"></div>
-        <div class="rail-dot" id="railDot" style="top:8px"></div>
-        <ul id="railList">
-          <li data-fl="FL500"><p class="fl">FL500</p><p class="nm">Program</p></li>
-          <li data-fl="FL200"><p class="fl">FL200</p><p class="nm">Domains</p></li>
-          <li data-fl="FL050"><p class="fl">FL050</p><p class="nm">In domain</p></li>
-        </ul>
+  <header class="head">
+    <div>
+      <p class="eyebrow">The Scion Group &middot; Data Governance Council</p>
+      <h1>Governance Leaderboard</h1>
+      <p class="sub">Task-weighted, participating combinations only &middot; snapshot <span id="stamp"></span></p>
+    </div>
+  </header>
+
+  <div class="bars">
+    <div class="tgroup">
+      <span class="tlabel">Phase</span>
+      <div class="tabs gold" id="tabsPhase" role="tablist" aria-label="Choose a phase">
+        <button type="button" role="tab" data-v="lite">DG Lite</button>
+        <button type="button" role="tab" data-v="heavy">DG Heavy</button>
+      </div>
+    </div>
+    <span class="dot-sep"></span>
+    <div class="tgroup">
+      <span class="tlabel">View</span>
+      <div class="tabs" id="tabsView" role="tablist" aria-label="Choose a view">
+        <button type="button" role="tab" data-v="domains">Domains</button>
+        <button type="button" role="tab" data-v="departments">Departments</button>
       </div>
     </div>
   </div>
 
-  <div class="col">
-    <header class="head">
+  <div class="readout">
+    <div class="sweep"></div>
+    <div class="readout-grid">
       <div>
-        <p class="eyebrow">The Scion Group &middot; Data Governance Council</p>
-        <h1>Governance Leaderboard</h1>
-        <p class="sub">Task-weighted, participating combinations only &middot; snapshot <span id="stamp"></span></p>
-      </div>
-    </header>
-
-    <div class="bars">
-      <div class="tgroup">
-        <span class="tlabel">Phase</span>
-        <div class="tabs gold" id="tabsPhase" role="tablist" aria-label="Choose a phase">
-          <button type="button" role="tab" data-v="lite">DG Lite</button>
-          <button type="button" role="tab" data-v="heavy">DG Heavy</button>
+        <p class="pbadge lite" id="phaseBadge">DG Lite</p>
+        <p class="label">All projects</p>
+        <div class="huge">
+          <p class="n tnum" id="programPct">0%</p>
+          <p class="p" id="programNote"></p>
         </div>
       </div>
-      <span class="dot-sep"></span>
-      <div class="tgroup">
-        <span class="tlabel">View</span>
-        <div class="tabs" id="tabsView" role="tablist" aria-label="Choose a view">
-          <button type="button" role="tab" data-v="domains">Domains</button>
-          <button type="button" role="tab" data-v="departments">Departments</button>
-        </div>
+      <div class="topics">
+        <div class="bar overall" style="height:12px"><span id="programBar"></span></div>
+        <div class="rows" id="topicRows"></div>
       </div>
     </div>
-
-    <div class="readout">
-      <div class="sweep"></div>
-      <div class="readout-grid">
-        <div>
-          <p class="pbadge lite" id="phaseBadge">DG Lite</p>
-          <p class="label">FL500 &middot; All projects</p>
-          <div class="huge">
-            <p class="n tnum" id="programPct">0%</p>
-            <p class="p" id="programNote"></p>
-          </div>
-        </div>
-        <div class="topics">
-          <div class="bar overall" style="height:12px"><span id="programBar"></span></div>
-          <div class="rows" id="topicRows"></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="notice"></div>
-    <div class="section" id="view"></div>
-
-    <footer>
-      <p id="footNote"></p>
-      <p class="badge">DGC Hub</p>
-    </footer>
   </div>
+
+  <div id="notice"></div>
+  <div class="section" id="view"></div>
+
+  <footer>
+    <p id="footNote"></p>
+    <p class="badge">DGC Hub</p>
+  </footer>
 </div>
 
 '''
@@ -601,21 +574,7 @@ window.DGC_RENDER = function(DATA){
     return '<div class="ghost" style="height:' + thickness + 'px"></div>';
   }
 
-  /* ---- altitude rail ---- */
-  function altitude(){
-    if(state.view === 'departments') return 'FL500';
-    return state.open ? 'FL050' : 'FL200';
-  }
-  function syncRail(){
-    var fl = altitude();
-    var tops = { FL500:'8px', FL200:'50%', FL050:'calc(100% - 26px)' };
-    $('railDot').style.top = tops[fl];
-    Array.prototype.forEach.call($('railList').children, function(li){
-      li.classList.toggle('on', li.getAttribute('data-fl') === fl);
-    });
-  }
-
-  /* ---- FL500 ---- */
+  /* ---- program readout ---- */
   var countFrom = 0;
   function buildReadout(){
     var D = phase();
@@ -653,14 +612,14 @@ window.DGC_RENDER = function(DATA){
     animateBars(document.querySelector('.readout'));
   }
 
-  /* ---- FL200 + FL050 ---- */
+  /* ---- domains + open panel ---- */
   function buildDomains(){
     var D = phase();
     var programPct = pct(D.program.done, D.program.total);
 
     var html = '<div class="sec-head">' +
-        '<h2>FL200 &middot; Domains, all projects combined</h2>' +
-        '<p>Click a domain to descend to project level</p>' +
+        '<h2>Domains, all projects combined</h2>' +
+        '<p>Click a domain to see it by project</p>' +
       '</div><div class="domains">';
 
     D.domains.forEach(function(d){
@@ -686,7 +645,7 @@ window.DGC_RENDER = function(DATA){
           '</span>' +
         '</button>' +
         '<div class="descent"><div class="descent-clip"><div class="descent-in">' +
-          '<p class="label">FL050 &middot; ' + esc(d.name) + ' by project</p>' +
+          '<p class="label">' + esc(d.name) + ' by project</p>' +
           '<div class="pgrid">';
 
       D.projects.forEach(function(p){
@@ -800,7 +759,6 @@ window.DGC_RENDER = function(DATA){
       });
     });
 
-    syncRail();
     animateBars(host);
   }
 
